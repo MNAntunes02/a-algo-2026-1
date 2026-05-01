@@ -89,3 +89,60 @@ def utility(board):
     elif w == O:
         return -1
     return 0
+
+
+def minimax(board):
+    """
+    Returns the optimal action for the current player on the board.
+    """
+    if terminal(board):
+        return None
+
+    current = player(board)
+
+    if current == X:
+        best_val = -math.inf
+        best_action = None
+        for action in actions(board):
+            val = min_value(result(board, action))
+            if val > best_val:
+                best_val = val
+                best_action = action
+                if best_val == 1:  # Can't do better than winning
+                    break
+    else:
+        best_val = math.inf
+        best_action = None
+        for action in actions(board):
+            val = max_value(result(board, action))
+            if val < best_val:
+                best_val = val
+                best_action = action
+                if best_val == -1:  # Can't do better than winning
+                    break
+
+    return best_action
+
+
+def max_value(board):
+    """Returns the maximum utility value achievable from this board state."""
+    if terminal(board):
+        return utility(board)
+    v = -math.inf
+    for action in actions(board):
+        v = max(v, min_value(result(board, action)))
+        if v == 1:  # Alpha-beta pruning shortcut
+            return v
+    return v
+
+
+def min_value(board):
+    """Returns the minimum utility value achievable from this board state."""
+    if terminal(board):
+        return utility(board)
+    v = math.inf
+    for action in actions(board):
+        v = min(v, max_value(result(board, action)))
+        if v == -1:  # Alpha-beta pruning shortcut
+            return v
+    return v
